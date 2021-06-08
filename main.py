@@ -9,20 +9,36 @@ WORD_FONT = ("Arial", 60, "bold")
 # ---------------------------- CARDS ------------------------------- #
 data = pandas.read_csv("./data/french_words.csv")
 word_dictionary = data.to_dict(orient="records")
+current_word = {}
 
 def next_card():
+  global current_word, flip_delay
+  
+  window.after_cancel(flip_delay)
+
   current_word = random.choice(word_dictionary)
-  canvas.itemconfig(card_title, text="French")
-  canvas.itemconfig(card_word, text=current_word["French"])
+  canvas.itemconfig(card_background, image=card_front_image)
+  canvas.itemconfig(card_title, text="French", fill="black")
+  canvas.itemconfig(card_word, text=current_word["French"], fill="black")
+
+  flip_delay = window.after(3000, func=flip_card)
+
+def flip_card():
+  canvas.itemconfig(card_background, image=card_back_image)
+  canvas.itemconfig(card_title, text="English", fill="white")
+  canvas.itemconfig(card_word, text=current_word["English"], fill="white")
 
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
-window.title("Flashy")
+window.title("French Cards")
 window.config(padx=50, pady=50, bg=BACKGROUND_COLOR)
+
+flip_delay = window.after(3000, func=flip_card)
 
 canvas = Canvas(width=800, height=526, bg=BACKGROUND_COLOR, highlightthickness=0)
 card_front_image = PhotoImage(file="./images/card_front.png")
-canvas.create_image(400, 263, image=card_front_image)
+card_back_image = PhotoImage(file="./images/card_back.png")
+card_background = canvas.create_image(400, 263, image=card_front_image)
 card_title = canvas.create_text(400, 150, text="Title", font=TITLE_FONT)
 card_word = canvas.create_text(400, 263, text="word", font=WORD_FONT)
 canvas.grid(row=0, column=0, columnspan=2)
