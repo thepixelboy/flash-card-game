@@ -6,10 +6,15 @@ BACKGROUND_COLOR = "#B1DDC6"
 TITLE_FONT = ("Arial", 40, "italic")
 WORD_FONT = ("Arial", 60, "bold")
 
-# ---------------------------- CARDS ------------------------------- #
-data = pandas.read_csv("./data/french_words.csv")
-word_dictionary = data.to_dict(orient="records")
+word_dictionary = {}
 current_word = {}
+
+try:
+  data = pandas.read_csv("./data/words_to_learn.csv")
+except FileNotFoundError:
+  data = pandas.read_csv("./data/french_words.csv")
+finally:
+  word_dictionary = data.to_dict(orient="records")
 
 def next_card():
   global current_word, flip_delay
@@ -27,6 +32,13 @@ def flip_card():
   canvas.itemconfig(card_background, image=card_back_image)
   canvas.itemconfig(card_title, text="English", fill="white")
   canvas.itemconfig(card_word, text=current_word["English"], fill="white")
+
+def remove_card():
+  word_dictionary.remove(current_word)
+
+  data = pandas.DataFrame(word_dictionary)
+  data.to_csv("./data/words_to_learn.csv")
+  next_card()
 
 # ---------------------------- UI SETUP ------------------------------- #
 window = Tk()
@@ -49,7 +61,7 @@ button_wrong = Button(image=button_wrong_image, highlightthickness=0, command=ne
 button_wrong.grid(row=1, column=0)
 
 button_right_image = PhotoImage(file="./images/right.png")
-button_right = Button(image=button_right_image, highlightthickness=0, command=next_card)
+button_right = Button(image=button_right_image, highlightthickness=0, command=remove_card)
 button_right.grid(row=1, column=1)
 
 next_card()
