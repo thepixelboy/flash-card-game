@@ -37,7 +37,7 @@ def remove_card():
   word_dictionary.remove(current_word)
 
   data = pandas.DataFrame(word_dictionary)
-  data.to_csv("./data/words_to_learn.csv")
+  data.to_csv("./data/words_to_learn.csv", index=False)
   next_card()
 
 # ---------------------------- UI SETUP ------------------------------- #
